@@ -1,61 +1,56 @@
-import { useEffect, useState } from 'react'
+// import { useEffect, useState } from 'react'
 import './App.css'
+// import { getRandomFact } from './services/facts'
+import { useCatImage } from './hooks/useCatImage'
+import { useCatFact } from './hooks/useCatFact'
 
-const CAT_ENDPOINT_RANDOM_FACT = 'https://catfact.ninja/fact'
-// const CAT_ENDPOINT_IMAGE_URL = `https://cataas.com/cat/says/${firstWord}?fontSize=50&fontColor=red&json=true` //! DEPRECATED
-const CAT_ENDPOINT_IMAGE_PREFIX = 'https://cataas.com/cat/says/'
-const CAT_ENDPOINT_IMAGE_CONFIG = '?fontSize=50&fontColor=red'
+// //* Custom hook
+// //! Always start the name of a custom hook with "use"
+// //! Custom hooks can use other hooks
+// // Custom hooks can be used to separate logic from the components
+// function useCatImage ({ fact }) {
+//   const [image, setImage] = useState()
+
+//   useEffect(() => {
+//     if (!fact) return
+
+//     const firstWord = fact.split(' ')[0]
+//     setImage(getImageURLFromFirstWord(firstWord))
+//   }, [fact])
+
+//   return { image }
+// }
 
 export function App () {
-  const [fact, setFact] = useState()
-  const [image, setImage] = useState()
+  const { fact, refreshFact } = useCatFact()
+  const { image } = useCatImage({ fact })
 
   //* Get a random fact about cats
-  useEffect(() => {
-    //* Fetch using async/await
-    // async function getRandomFact () {
-    //   const res = await fetch(CAT_ENDPOINT_RANDOM_FACT)
-    //   const json = await res.json()
-    //   setFact(json.fact)
-    // }
+  // useEffect(() => {
+  //   getRandomFact().then(newFact => setFact(newFact))
+  // }, []) // <-- Render only once since the dependency array is empty
 
-    // getRandomFact()
+  // //* Get image every time the fact changes
+  // useEffect(() => {
+  //   if (!fact) return
 
-    //* Fetch using promises
-    fetch(CAT_ENDPOINT_RANDOM_FACT)
-      .then(res => res.json())
-      .then(data => {
-        const { fact } = data
-        setFact(fact)
+  //   // const firstWord = fact.split(' ')[0]
+  //   // console.log(firstWord)
 
-        // const firstWord = fact.split(' ')[0]
-        // console.log(firstWord)
+  //   useCatImage({ fact })
+  // }, [fact])
 
-        // fetch(`https://cataas.com/cat/says/${firstWord}?fontSize=50&fontColor=red&json=true`)
-        //   .then(res => res.json())
-        //   .then(data => {
-        //     console.log(data)
-        //   })
-        // setImage(firstWord)
-      })
-  }, []) // <-- Render only once since the dependency array is empty
-
-  //* Get image every time the fact changes
-  useEffect(() => {
-    if (!fact) return
-
-    const firstWord = fact.split(' ')[0]
-    // console.log(firstWord)
-
-    setImage(firstWord)
-  }, [fact])
+  const handleClick = async () => {
+    refreshFact()
+  }
 
   return (
     <main>
       <h1>App de gatitos</h1>
+      <button onClick={handleClick}>Get new fact</button>
       <section>
         {fact && <p>{fact}</p>} {/* <-- conditional render */}
-        {image && <img src={`${CAT_ENDPOINT_IMAGE_PREFIX}${image}${CAT_ENDPOINT_IMAGE_CONFIG}`} alt={`Image extracted using the first word of the fact: ${fact}`} />}
+        {image && <img src={image} alt={`Image extracted using the first word of the fact: ${fact}`} />}
       </section>
     </main>
   )
