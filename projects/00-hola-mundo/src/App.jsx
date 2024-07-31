@@ -19,18 +19,18 @@ const users = [
   }
 ]
 
-export function App() {
+export function App () {
   return (
     <section className='App'>
       {
         users.map(({ userName, name, isFollowing }) => (
-            <TwiterFollowCard
-              userName={userName}
-              initialIsFollowing={isFollowing}
-              key={userName}
-            >
-              {name}
-            </TwiterFollowCard>
+          <TwiterFollowCard
+            userName={userName}
+            initialIsFollowing={isFollowing}
+            key={userName}
+          >
+            {name}
+          </TwiterFollowCard>
         ))
       }
     </section>
