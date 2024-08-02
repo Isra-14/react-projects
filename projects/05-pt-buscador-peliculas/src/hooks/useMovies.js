@@ -1,32 +1,77 @@
-import withResults from '../mocks/with-results.json'
-import withoutResults from '../mocks/no-results.json'
-import { useState } from 'react'
+import { useState, useRef, useMemo, useCallback } from 'react'
+import { searchMovies } from '../services/movies'
 
-export function useMovies ({ search }) {
-  const [responseMovies, setResponseMovies] = useState([])
+export function useMovies ({ search, sort }) {
+  const [movies, setMovies] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [, setError] = useState(null)
+  const lastSearch = useRef(search)
 
-  const movies = responseMovies.Search
+  //! Use memo to render only when the search changes
+  // const getMovies = useMemo(() => {
+  //   return async () => {
+  //     if (search === lastSearch.current) return
 
-  //! Structure the data to avoid be dependent of the API response
-  const mappedMovies = movies?.map(movie => ({
-    id: movie.imdbID,
-    title: movie.Title,
-    year: movie.Year,
-    poster: movie.Poster
-  }))
+  //     try {
+  //       setLoading(true)
+  //       setError(null)
+  //       lastSearch.current = search
+  //       const newMovies = await searchMovies({ search })
+  //       setMovies(newMovies)
+  //     } catch (e) {
+  //       setError(e.message)
+  //     } finally {
+  //       setLoading(false)
+  //     }
+  //   }
+  // }, [search])
 
-  const getMovies = () => {
-    if (search) {
-      // setResponseMovies(withResults)
-      fetch(`http://www.omdbapi.com/?apikey=80e32b0d&s=${search}`)
-        .then(res => res.json())
-        .then(data => {
-          setResponseMovies(data)
-        })
-    } else {
-      setResponseMovies(withoutResults)
-    }
-  }
+  //! Use memo and set parameter to create function only once (Performance)
+  // const getMovies = useMemo(() => {
+  //   return async ({ search }) => {
+  //     if (search === lastSearch.current) return
 
-  return { movies: mappedMovies, getMovies }
+  //     try {
+  //       setLoading(true)
+  //       setError(null)
+  //       lastSearch.current = search
+  //       const newMovies = await searchMovies({ search })
+  //       setMovies(newMovies)
+  //     } catch (e) {
+  //       setError(e.message)
+  //     } finally {
+  //       setLoading(false)
+  //     }
+  //   }
+  // }, [])
+
+  //! useMemo VS useCallback
+  //* useCallback is used to memoize functions (use useMemo itself)
+  //* useMemo is used to memoize values
+  const getMovies = useCallback(
+    async ({ search }) => {
+      if (search === lastSearch.current) return
+
+      try {
+        setLoading(true)
+        setError(null)
+        lastSearch.current = search
+        const newMovies = await searchMovies({ search })
+        setMovies(newMovies)
+      } catch (e) {
+        setError(e.message)
+      } finally {
+        setLoading(false)
+      }
+    }, [])
+
+  const sortedMovies = useMemo(() => {
+    // console.log('Memo sorting movies')
+
+    return sort
+      ? [...movies].sort((a, b) => a.title.localeCompare(b.title))
+      : movies
+  }, [movies, sort])
+
+  return { movies: sortedMovies, getMovies, loading }
 }

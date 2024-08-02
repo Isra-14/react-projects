@@ -1,22 +1,37 @@
+import { useState, useCallback } from 'react'
 import './App.css'
 import { Movies } from './components/Movies'
 import { useMovies } from './hooks/useMovies'
 import { useSearch } from './hooks/useSearch'
+import debounce from 'just-debounce-it'
 
 function App () {
+  const [sort, setSort] = useState(false)
   const { search, error, updateSearch } = useSearch()
-  const { movies, getMovies } = useMovies({ search })
+  const { movies, getMovies, loading } = useMovies({ search, sort })
+
+  const debounceMovies = useCallback(
+    debounce(search => {
+      // console.log('Debounce')
+      getMovies({ search })
+    }, 300) // 300ms
+    , [getMovies])
 
   const handleChange = (event) => {
     const newQuery = event.target.value
     if (newQuery.startsWith(' ')) return
-    updateSearch(event.target.value)
+    updateSearch(newQuery)
+    debounceMovies(newQuery)
   }
 
   const handleSubmit = (event) => {
     event.preventDefault()
-    console.log({ search })
-    getMovies()
+    // console.log({ search })
+    getMovies({ search })
+  }
+
+  const handleClick = () => {
+    setSort(!sort)
   }
 
   return (
@@ -24,10 +39,6 @@ function App () {
       <h1>Movie searcher</h1>
       <header>
         <form className='form' onSubmit={handleSubmit}>
-          {/* Uncontrolled way */}
-          {/* <input name='query' placeholder='Spiderman, Avengers, Deadpool...' /> */}
-
-          {/* Controlled way */}
           <input
             style={{
               border: '1px solid transparent',
@@ -38,13 +49,14 @@ function App () {
             name='query'
             placeholder='Spiderman, Avengers, Deadpool...'
           />
+          <input type='checkbox' name='sort' onClick={handleClick} />
           <button type='submit'>Search</button>
         </form>
         {error && <p style={{ color: 'red' }}>{error}</p>}
       </header>
 
       <main>
-        <Movies movies={movies} />
+        {loading ? <p>Loading...</p> : <Movies movies={movies} />}
       </main>
     </div>
   )

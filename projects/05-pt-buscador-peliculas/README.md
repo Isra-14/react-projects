@@ -4,8 +4,7 @@
 
 Crea una aplicación para buscar películas
 
-- API a utilizar: [OMDb API](http://www.omdbapi.com/)
-- API_KEY: 80e32b0d
+- API a utilizar: [OMDb API](http://www.omdbapi.com/) (necesitas registrarte para obtener una API Key)
 
 ### Requerimientos:
 
@@ -18,3 +17,11 @@ Crea una aplicación para buscar películas
 ✅ Hacer el fetch a la API
 
 ✅ Haz que las peliculas se muestren en un grid responsive.
+
+### Bonus:
+
+✅ Evitar que haga la misma búsqueda dos veces seguidas. (useRef)
+
+✅ Hacer que la búsqueda se haga automáticamente al escribir.
+
+✅ Evitar que se haga la búsqueda continuamente al escribir. (debounce)
