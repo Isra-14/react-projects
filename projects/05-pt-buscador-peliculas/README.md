@@ -13,5 +13,8 @@ Crea una aplicación para buscar películas
 
 ✅ Lista las películas ~~encontradas~~ y muestra el título, año y poster.
 
-- Que el formulario funcione
-- Haz que las peliculas se muestren en un grid responsive.
+✅ Que el formulario funcione
+
+✅ Hacer el fetch a la API
+
+✅ Haz que las peliculas se muestren en un grid responsive.
